@@ -1,0 +1,7 @@
+FW_PRN_2026_02_26_001: Adjust DRAM init timings and add boot error telemetry
+
+- Tune tRCD/tRP values by +2 cycles
+- Add verbose boot-stage markers to UART log
+- Guard against NULL ptr in driver init
+
+Refs: TestRail TR-RUN-2026-02-26-01, S3 FW_PRN_2026_02_26_001 folder

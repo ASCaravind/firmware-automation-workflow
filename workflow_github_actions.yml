@@ -1,0 +1,31 @@
+name: Firmware PR Validation (FW_PRN_2026_02_26_001)
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  set-fw-id-and-annotate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract FW_ID from PR title
+        id: fw
+        run: |
+          TITLE="${ github.event.pull_request.title }"
+          # Expect title to contain FW_ID in square brackets, fallback to default
+          if echo "$TITLE" | grep -Eo "FW_[A-Z]+_[0-9_]+"; then
+            echo "fw_id=$(echo $TITLE | grep -Eo 'FW_[A-Z]+_[0-9_]+' | head -1)" >> $GITHUB_OUTPUT
+          else
+            echo "fw_id=FW_PRN_2026_02_26_001" >> $GITHUB_OUTPUT
+          fi
+      - name: Print FW_ID
+        run: echo "FW_ID=${ steps.fw.outputs.fw_id }"
+      - name: Create PR comment scaffold
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: fw-validation
+          message: |
+            **FW Validation Bootstrap**
+            - FW_ID: `${ steps.fw.outputs.fw_id }`
+            - TestRail Run: TR-RUN-2026-02-26-01
+            - S3 Prefix: s3://firmwareerrorlogs1/${ steps.fw.outputs.fw_id }/
